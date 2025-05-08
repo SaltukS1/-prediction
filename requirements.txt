@@ -1,12 +1,22 @@
-flask==2.0.1
-tensorflow==2.19.0
-numpy>=1.20.0
-pandas>=1.3.0
-scikit-learn>=0.24.0
-requests>=2.25.0
-python-dotenv>=0.19.0
-waitress>=2.0.0
-joblib>=1.0.0
-Werkzeug==2.0.1
-beautifulsoup4==4.9.3
-aiohttp==3.8.1 
+# tahmin - Futbol Maç Tahmin Uygulaması
+
+# Temel kütüphaneler
+numpy==1.24.3
+pandas==2.0.3
+matplotlib==3.7.2
+scikit-learn==1.3.0
+
+# Web ve API
+flask==2.3.3
+requests==2.31.0
+beautifulsoup4==4.12.2
+
+# Derin öğrenme
+tensorflow==2.13.0
+joblib==1.3.2
+
+# Bilimsel hesaplama
+scipy==1.11.2
+
+# Veri formatları
+pyyaml==6.0.1 

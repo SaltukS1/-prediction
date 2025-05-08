@@ -10,6 +10,10 @@ from data.data_collector import DataCollector
 from data.data_processor import DataProcessor
 import signal
 import sys
+import json
+from typing import Dict, Any, List
+import pandas as pd
+from datetime import datetime
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 load_dotenv()
