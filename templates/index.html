@@ -20,8 +20,9 @@
 
     <div class="container mt-4">
         <div class="row">
-            <div class="col-md-6">
-                <div class="card">
+            <!-- Maç Seçimi Kısmı -->
+            <div class="col-md-4">
+                <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="card-title mb-0">Maç Seçimi</h5>
                     </div>
@@ -35,7 +36,7 @@
                                 <label for="awayTeam" class="form-label">Deplasman Takımı</label>
                                 <input type="text" class="form-control" id="awayTeam" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary w-100">
                                 <i class="fas fa-calculator me-2"></i>
                                 Tahmin Yap
                             </button>
@@ -44,67 +45,253 @@
                 </div>
             </div>
             
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">Tahmin Sonuçları</h5>
+            <!-- Tahmin Sonuçları Kısmı -->
+            <div class="col-md-8">
+                <div id="loadingSpinner" class="text-center my-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
                     </div>
-                    <div class="card-body">
-                        <div id="predictions" style="display: none;">
+                    <p class="mt-2">Tahminler hesaplanıyor...</p>
+                </div>
+                
+                <div id="predictions" style="display: none;">
+                    <!-- Maç Sonucu ve Skor Tahmini -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">Maç Sonucu ve Skor Tahmini</h5>
+                        </div>
+                        <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-7">
                                     <h6>Maç Sonucu</h6>
-                                    <div class="progress mb-2">
-                                        <div id="winProb" class="progress-bar bg-success" role="progressbar"></div>
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Ev Sahibi Kazanır</span>
+                                            <span id="winProb" class="badge bg-success">50%</span>
+                                        </div>
+                                        <div class="progress" style="height: 15px;">
+                                            <div id="winProbBar" class="progress-bar bg-success" role="progressbar" style="width: 50%"></div>
+                                        </div>
                                     </div>
-                                    <div class="progress mb-2">
-                                        <div id="drawProb" class="progress-bar bg-warning" role="progressbar"></div>
+                                    
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Beraberlik</span>
+                                            <span id="drawProb" class="badge bg-warning">25%</span>
+                                        </div>
+                                        <div class="progress" style="height: 15px;">
+                                            <div id="drawProbBar" class="progress-bar bg-warning" role="progressbar" style="width: 25%"></div>
+                                        </div>
                                     </div>
-                                    <div class="progress mb-3">
-                                        <div id="lossProb" class="progress-bar bg-danger" role="progressbar"></div>
+                                    
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Deplasman Kazanır</span>
+                                            <span id="lossProb" class="badge bg-danger">25%</span>
+                                        </div>
+                                        <div class="progress" style="height: 15px;">
+                                            <div id="lossProbBar" class="progress-bar bg-danger" role="progressbar" style="width: 25%"></div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-6">
+                                <div class="col-md-5 text-center">
                                     <h6>Tahmini Skor</h6>
-                                    <div id="scorePrediction" class="display-6 text-center mb-3"></div>
+                                    <div id="scorePrediction" class="display-3 fw-bold text-center my-4">0 - 0</div>
+                                    <p class="text-muted">
+                                        Beklenen Toplam Gol: <span id="expectedGoals">2.5</span><br>
+                                        Gol Aralığı: <span id="goalRange">1.5-3.5</span>
+                                    </p>
                                 </div>
                             </div>
-                            
-                            <div class="row mt-3">
-                                <div class="col-md-6">
-                                    <h6>Gol Tahmini</h6>
-                                    <div class="list-group">
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            2.5 Üst
-                                            <span id="overProb" class="badge bg-primary rounded-pill"></span>
-                                        </div>
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            2.5 Alt
-                                            <span id="underProb" class="badge bg-primary rounded-pill"></span>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gol ve Korner Tahminleri -->
+                    <div class="row">
+                        <!-- Gol Tahminleri -->
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="card-title mb-0">Gol Tahminleri</h5>
                                 </div>
-                                
-                                <div class="col-md-6">
-                                    <h6>Korner Tahmini</h6>
-                                    <div class="list-group">
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            Toplam Korner
-                                            <span id="totalCorners" class="badge bg-primary rounded-pill"></span>
+                                <div class="card-body">
+                                    <h6>Alt/Üst Olasılıkları</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Eşik</th>
+                                                    <th>Üst</th>
+                                                    <th>Alt</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1.5</td>
+                                                    <td id="over1_5">80%</td>
+                                                    <td id="under1_5">20%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2.5</td>
+                                                    <td id="over2_5">55%</td>
+                                                    <td id="under2_5">45%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3.5</td>
+                                                    <td id="over3_5">30%</td>
+                                                    <td id="under3_5">70%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>4.5</td>
+                                                    <td id="over4_5">15%</td>
+                                                    <td id="under4_5">85%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="alert alert-info mt-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Karşılıklı Gol (Var):</span>
+                                            <span id="bttsYes">65%</span>
                                         </div>
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            8.5 Üst
-                                            <span id="cornersOver8" class="badge bg-primary rounded-pill"></span>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Karşılıklı Gol (Yok):</span>
+                                            <span id="bttsNo">35%</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div id="loadingSpinner" class="text-center" style="display: none;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Yükleniyor...</span>
+                        <!-- Korner Tahminleri -->
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header bg-warning text-white">
+                                    <h5 class="card-title mb-0">Korner Tahminleri</h5>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="mb-3">Toplam Korner: <span id="totalCorners" class="badge bg-warning text-dark">10</span></h6>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Eşik</th>
+                                                    <th>Üst</th>
+                                                    <th>Alt</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>3.5</td>
+                                                    <td id="cornerOver3_5">95%</td>
+                                                    <td id="cornerUnder3_5">5%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>4.5</td>
+                                                    <td id="cornerOver4_5">90%</td>
+                                                    <td id="cornerUnder4_5">10%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5.5</td>
+                                                    <td id="cornerOver5_5">85%</td>
+                                                    <td id="cornerUnder5_5">15%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>8.5</td>
+                                                    <td id="cornerOver8_5">60%</td>
+                                                    <td id="cornerUnder8_5">40%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- İlk/İkinci Yarı Tahminleri -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">İlk/İkinci Yarı Tahminleri</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">İlk Yarı</div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Ev Sahibi Kazanır:</span>
+                                                    <span id="firstHalfHomeWin">40%</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Beraberlik:</span>
+                                                    <span id="firstHalfDraw">45%</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Deplasman Kazanır:</span>
+                                                    <span id="firstHalfAwayWin">15%</span>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-primary">
+                                                Tahmini Gol Sayısı: <span id="firstHalfGoals">1.2</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">İkinci Yarı</div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Ev Sahibi Kazanır:</span>
+                                                    <span id="secondHalfHomeWin">45%</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Beraberlik:</span>
+                                                    <span id="secondHalfDraw">35%</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Deplasman Kazanır:</span>
+                                                    <span id="secondHalfAwayWin">20%</span>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-primary">
+                                                Tahmini Gol Sayısı: <span id="secondHalfGoals">1.5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gol Atabilecek Oyuncular -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title mb-0">Gol Atabilecek Oyuncular</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 id="homeTeamName" class="fw-bold mb-3">Ev Sahibi Takım</h6>
+                                    <ul id="homeTeamScorers" class="list-group">
+                                        <!-- JavaScript ile doldurulacak -->
+                                    </ul>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 id="awayTeamName" class="fw-bold mb-3">Deplasman Takımı</h6>
+                                    <ul id="awayTeamScorers" class="list-group">
+                                        <!-- JavaScript ile doldurulacak -->
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -45,19 +45,28 @@ def predict():
         # Verileri işle
         processed_data = data_processor.process_match_data(home_team_data, away_team_data)
         
+        # Takım isimlerini ekle - tahmin modeli için
+        processed_data['home_team_name'] = home_team
+        processed_data['away_team_name'] = away_team
+        
         # Tahminleri yap
         predictions = prediction_model.predict(processed_data)
         
         return jsonify({
             'success': True,
             'predictions': {
-                'win_probability': predictions['win_prob'],
-                'draw_probability': predictions['draw_prob'],
-                'loss_probability': predictions['loss_prob'],
-                'over_under_2_5': predictions['over_under_2_5'],
-                'corner_prediction': predictions['corner_prediction'],
+                'match_result': {
+                    'win_probability': predictions['win_prob'],
+                    'draw_probability': predictions['draw_prob'],
+                    'loss_probability': predictions['loss_prob']
+                },
+                'score_prediction': predictions['score_prediction'],
+                'total_goals': predictions['total_goals'],
+                'over_under_goals': predictions['over_under_goals'],
                 'btts_prediction': predictions['btts_prediction'],
-                'score_prediction': predictions['score_prediction']
+                'half_predictions': predictions['half_predictions'],
+                'corner_prediction': predictions['corner_prediction'],
+                'goalscorer_predictions': predictions['goalscorer_predictions']
             }
         })
     except Exception as e:
