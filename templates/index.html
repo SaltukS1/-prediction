@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol Maç Tahmin Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-futbol me-2"></i>
+                Futbol Tahmin Sistemi
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Maç Seçimi</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="predictionForm">
+                            <div class="mb-3">
+                                <label for="homeTeam" class="form-label">Ev Sahibi Takım</label>
+                                <input type="text" class="form-control" id="homeTeam" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="awayTeam" class="form-label">Deplasman Takımı</label>
+                                <input type="text" class="form-control" id="awayTeam" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calculator me-2"></i>
+                                Tahmin Yap
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">Tahmin Sonuçları</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="predictions" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Maç Sonucu</h6>
+                                    <div class="progress mb-2">
+                                        <div id="winProb" class="progress-bar bg-success" role="progressbar"></div>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div id="drawProb" class="progress-bar bg-warning" role="progressbar"></div>
+                                    </div>
+                                    <div class="progress mb-3">
+                                        <div id="lossProb" class="progress-bar bg-danger" role="progressbar"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6>Tahmini Skor</h6>
+                                    <div id="scorePrediction" class="display-6 text-center mb-3"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <h6>Gol Tahmini</h6>
+                                    <div class="list-group">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            2.5 Üst
+                                            <span id="overProb" class="badge bg-primary rounded-pill"></span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            2.5 Alt
+                                            <span id="underProb" class="badge bg-primary rounded-pill"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6>Korner Tahmini</h6>
+                                    <div class="list-group">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            Toplam Korner
+                                            <span id="totalCorners" class="badge bg-primary rounded-pill"></span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            8.5 Üst
+                                            <span id="cornersOver8" class="badge bg-primary rounded-pill"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="loadingSpinner" class="text-center" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 
