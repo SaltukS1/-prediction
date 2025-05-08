@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.keras import layers
 import numpy as np
 from typing import Dict, List, Any, Optional, Tuple
 import math
@@ -8,9 +9,18 @@ from scipy.stats import poisson
 from datetime import datetime, timedelta
 import os
 import sys
+import requests
+import json
+import joblib
+import logging
+from sklearn.preprocessing import StandardScaler
 
 # Proje kök dizinini Python yoluna ekle
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Loglama yapılandırması
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # İçe aktarmalar
 from src.data.api_client import FootballApiClient
@@ -21,6 +31,12 @@ class PredictionModel:
     
     def __init__(self):
         """Tahmin modelini başlatır."""
+        # Model dosya yollarını belirle
+        model_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "models")
+        os.makedirs(model_dir, exist_ok=True)
+        self.model_path = os.path.join(model_dir, "prediction_model.h5")
+        self.scaler_path = os.path.join(model_dir, "prediction_scaler.joblib")
+        
         self._initialize_model()
         
         # API istemcisini başlat
@@ -31,6 +47,28 @@ class PredictionModel:
         
         # Hybrid mod (0: Sadece istatistiksel, 1: Sadece ML, 0.5: Karma)
         self.hybrid_mode = 0.5
+    
+    def set_hybrid_mode(self, value: float) -> None:
+        """Hibrit mod ağırlığını ayarlar.
+        
+        Args:
+            value: 0.0 (tamamen istatistiksel) ile 1.0 (tamamen ML) arasında bir değer
+        """
+        if value < 0.0 or value > 1.0:
+            raise ValueError("Hibrit mod değeri 0.0 ile 1.0 arasında olmalıdır")
+        
+        self.hybrid_mode = value
+        print(f"Hibrit mod ayarlandı: {value:.2f} (ML ağırlığı: %{value*100:.0f}, İstatistiksel ağırlık: %{(1-value)*100:.0f})")
+    
+    def get_hybrid_mode(self) -> Dict[str, float]:
+        """Mevcut hibrit mod ayarlarını döndürür."""
+        return {
+            "hybrid_mode": self.hybrid_mode,
+            "ml_weight": self.hybrid_mode,
+            "statistical_weight": 1 - self.hybrid_mode,
+            "ml_percentage": self.hybrid_mode * 100,
+            "statistical_percentage": (1 - self.hybrid_mode) * 100
+        }
     
     def _initialize_model(self):
         """Model yapısını oluşturur veya kaydedilmiş modeli yükler."""

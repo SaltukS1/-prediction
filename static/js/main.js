@@ -94,78 +94,97 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function updatePredictions(predictions, homeTeam, awayTeam) {
-        // Takım isimlerini güncelle
-        document.getElementById('homeTeamName').textContent = homeTeam;
-        document.getElementById('awayTeamName').textContent = awayTeam;
-        
-        // Maç sonucu tahminlerini güncelle
-        const matchResult = predictions.match_result;
-        updateProbability('winProb', 'winProbBar', matchResult.win_probability);
-        updateProbability('drawProb', 'drawProbBar', matchResult.draw_probability);
-        updateProbability('lossProb', 'lossProbBar', matchResult.loss_probability);
-        
-        // Skor tahminini güncelle
-        const scorePrediction = document.getElementById('scorePrediction');
-        scorePrediction.textContent = `${predictions.score_prediction.home} - ${predictions.score_prediction.away}`;
-        
-        // Toplam gol tahminini güncelle
-        document.getElementById('expectedGoals').textContent = predictions.total_goals.expected;
-        document.getElementById('goalRange').textContent = predictions.total_goals.range;
-        
-        // Alt/Üst gol tahminlerini güncelle
-        updateOverUnderProbability('1_5', predictions.over_under_goals['1.5']);
-        updateOverUnderProbability('2_5', predictions.over_under_goals['2.5']);
-        updateOverUnderProbability('3_5', predictions.over_under_goals['3.5']);
-        updateOverUnderProbability('4_5', predictions.over_under_goals['4.5']);
-        
-        // Karşılıklı gol tahminlerini güncelle
-        document.getElementById('bttsYes').textContent = `${(predictions.btts_prediction.yes * 100).toFixed(1)}%`;
-        document.getElementById('bttsNo').textContent = `${(predictions.btts_prediction.no * 100).toFixed(1)}%`;
-        
-        // Korner tahminlerini güncelle
-        document.getElementById('totalCorners').textContent = predictions.corner_prediction.total_corners;
-        
-        // Korner alt/üst tahminlerini güncelle
-        updateCornerProbability('3_5', predictions.corner_prediction.corner_ranges['3.5']);
-        updateCornerProbability('4_5', predictions.corner_prediction.corner_ranges['4.5']);
-        updateCornerProbability('5_5', predictions.corner_prediction.corner_ranges['5.5']);
-        updateCornerProbability('8_5', predictions.corner_prediction.corner_ranges['8.5']);
-        
-        // İlk yarı tahminlerini güncelle
-        const firstHalf = predictions.half_predictions.first_half;
-        document.getElementById('firstHalfHomeWin').textContent = `${(firstHalf.home_win * 100).toFixed(1)}%`;
-        document.getElementById('firstHalfDraw').textContent = `${(firstHalf.draw * 100).toFixed(1)}%`;
-        document.getElementById('firstHalfAwayWin').textContent = `${(firstHalf.away_win * 100).toFixed(1)}%`;
-        document.getElementById('firstHalfGoals').textContent = firstHalf.goals;
-        
-        // İkinci yarı tahminlerini güncelle
-        const secondHalf = predictions.half_predictions.second_half;
-        document.getElementById('secondHalfHomeWin').textContent = `${(secondHalf.home_win * 100).toFixed(1)}%`;
-        document.getElementById('secondHalfDraw').textContent = `${(secondHalf.draw * 100).toFixed(1)}%`;
-        document.getElementById('secondHalfAwayWin').textContent = `${(secondHalf.away_win * 100).toFixed(1)}%`;
-        document.getElementById('secondHalfGoals').textContent = secondHalf.goals;
-        
-        // Gol atabilecek oyuncuları güncelle
-        updateGoalscorers('homeTeamScorers', predictions.goalscorer_predictions.home_team);
-        updateGoalscorers('awayTeamScorers', predictions.goalscorer_predictions.away_team);
-        
-        // Takım karşılaştırma bölümünü göster ve güncelle
-        updateTeamComparison(predictions.team_comparison || {
-            home_team: {
-                form: Math.round(predictions.match_result.win_probability * 100),
-                season_points: Math.round(matchResult.win_probability * 100),
-                goals_scored_avg: predictions.total_goals.home_expected || 1.5,
-                goals_conceded_avg: 1.0,
-                last_matches: generateMockMatches(matchResult.win_probability)
-            },
-            away_team: {
-                form: Math.round(predictions.match_result.loss_probability * 100),
-                season_points: Math.round(matchResult.loss_probability * 90),
-                goals_scored_avg: predictions.total_goals.away_expected || 1.0,
-                goals_conceded_avg: 1.2,
-                last_matches: generateMockMatches(matchResult.loss_probability)
-            }
-        }, homeTeam, awayTeam);
+        try {
+            // Takım isimlerini güncelle
+            document.getElementById('homeTeamName').textContent = homeTeam;
+            document.getElementById('awayTeamName').textContent = awayTeam;
+            
+            // Maç sonucu tahminlerini güncelle
+            const matchResult = predictions.match_result || {};
+            updateProbability('winProb', 'winProbBar', matchResult.home_win || 0.33);
+            updateProbability('drawProb', 'drawProbBar', matchResult.draw || 0.33);
+            updateProbability('lossProb', 'lossProbBar', matchResult.away_win || 0.33);
+            
+            // Skor tahminini güncelle
+            const scorePrediction = document.getElementById('scorePrediction');
+            const scorePredData = predictions.score_prediction || {home: 0, away: 0};
+            scorePrediction.textContent = `${scorePredData.home || 0} - ${scorePredData.away || 0}`;
+            
+            // Toplam gol tahminini güncelle
+            const totalGoals = predictions.total_goals || {expected: "?", range: "?"};
+            document.getElementById('expectedGoals').textContent = totalGoals.expected || "?";
+            document.getElementById('goalRange').textContent = totalGoals.range || "?";
+            
+            // Alt/Üst gol tahminlerini güncelle
+            const overUnderGoals = predictions.over_under_goals || {};
+            updateOverUnderProbability('1_5', overUnderGoals['1.5']);
+            updateOverUnderProbability('2_5', overUnderGoals['2.5']);
+            updateOverUnderProbability('3_5', overUnderGoals['3.5']);
+            updateOverUnderProbability('4_5', overUnderGoals['4.5']);
+            
+            // Karşılıklı gol tahminlerini güncelle
+            const btts = predictions.btts_prediction || {yes: 0.5, no: 0.5};
+            document.getElementById('bttsYes').textContent = `${((btts.yes || 0.5) * 100).toFixed(1)}%`;
+            document.getElementById('bttsNo').textContent = `${((btts.no || 0.5) * 100).toFixed(1)}%`;
+            
+            // Korner tahminlerini güncelle
+            const cornerPrediction = predictions.corner_prediction || {total_corners: "?"};
+            document.getElementById('totalCorners').textContent = cornerPrediction.total_corners || "?";
+            
+            // Korner alt/üst tahminlerini güncelle
+            const cornerRanges = (cornerPrediction.corner_ranges || {});
+            updateCornerProbability('3_5', cornerRanges['3.5']);
+            updateCornerProbability('4_5', cornerRanges['4.5']);
+            updateCornerProbability('5_5', cornerRanges['5.5']);
+            updateCornerProbability('8_5', cornerRanges['8.5']);
+            
+            // İlk yarı tahminlerini güncelle
+            const halfPredictions = predictions.half_predictions || {
+                first_half: {home_win: 0.33, draw: 0.34, away_win: 0.33, goals: "?"},
+                second_half: {home_win: 0.33, draw: 0.34, away_win: 0.33, goals: "?"}
+            };
+            
+            const firstHalf = halfPredictions.first_half || {};
+            document.getElementById('firstHalfHomeWin').textContent = `${((firstHalf.home_win || 0.33) * 100).toFixed(1)}%`;
+            document.getElementById('firstHalfDraw').textContent = `${((firstHalf.draw || 0.34) * 100).toFixed(1)}%`;
+            document.getElementById('firstHalfAwayWin').textContent = `${((firstHalf.away_win || 0.33) * 100).toFixed(1)}%`;
+            document.getElementById('firstHalfGoals').textContent = firstHalf.goals || "?";
+            
+            // İkinci yarı tahminlerini güncelle
+            const secondHalf = halfPredictions.second_half || {};
+            document.getElementById('secondHalfHomeWin').textContent = `${((secondHalf.home_win || 0.33) * 100).toFixed(1)}%`;
+            document.getElementById('secondHalfDraw').textContent = `${((secondHalf.draw || 0.34) * 100).toFixed(1)}%`;
+            document.getElementById('secondHalfAwayWin').textContent = `${((secondHalf.away_win || 0.33) * 100).toFixed(1)}%`;
+            document.getElementById('secondHalfGoals').textContent = secondHalf.goals || "?";
+            
+            // Gol atabilecek oyuncuları güncelle
+            const goalscorers = predictions.goalscorer_predictions || {home_team: [], away_team: []};
+            updateGoalscorers('homeTeamScorers', goalscorers.home_team || []);
+            updateGoalscorers('awayTeamScorers', goalscorers.away_team || []);
+            
+            // Takım karşılaştırma bölümünü göster ve güncelle
+            const teamComparison = predictions.team_comparison || {
+                home_team: {
+                    form: Math.round((matchResult.home_win || 0.5) * 100),
+                    season_points: Math.round((matchResult.home_win || 0.5) * 100),
+                    goals_scored_avg: (totalGoals.home_expected || 1.5),
+                    goals_conceded_avg: 1.0,
+                    last_matches: generateMockMatches(matchResult.home_win || 0.5)
+                },
+                away_team: {
+                    form: Math.round((matchResult.away_win || 0.5) * 100),
+                    season_points: Math.round((matchResult.away_win || 0.5) * 90),
+                    goals_scored_avg: (totalGoals.away_expected || 1.0),
+                    goals_conceded_avg: 1.2,
+                    last_matches: generateMockMatches(matchResult.away_win || 0.5)
+                }
+            };
+            
+            updateTeamComparison(teamComparison, homeTeam, awayTeam);
+        } catch (error) {
+            console.error('Tahmin güncellemesi sırasında hata:', error);
+            alert('Tahmin verileri işlenirken bir hata oluştu: ' + error.message);
+        }
     }
     
     function updateProbability(labelId, barId, probability) {
@@ -179,6 +198,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateOverUnderProbability(threshold, probabilities) {
+        if (!probabilities || typeof probabilities !== 'object' || probabilities.over === undefined || probabilities.under === undefined) {
+            // Handle missing or invalid data with default values
+            document.getElementById(`over${threshold}`).textContent = "N/A";
+            document.getElementById(`under${threshold}`).textContent = "N/A";
+            return;
+        }
+        
         const overPercentage = (probabilities.over * 100).toFixed(1);
         const underPercentage = (probabilities.under * 100).toFixed(1);
         
@@ -187,6 +213,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateCornerProbability(threshold, probabilities) {
+        if (!probabilities || typeof probabilities !== 'object' || probabilities.over === undefined || probabilities.under === undefined) {
+            // Handle missing or invalid data with default values
+            document.getElementById(`cornerOver${threshold}`).textContent = "N/A";
+            document.getElementById(`cornerUnder${threshold}`).textContent = "N/A";
+            return;
+        }
+        
         const overPercentage = (probabilities.over * 100).toFixed(1);
         const underPercentage = (probabilities.under * 100).toFixed(1);
         
@@ -198,39 +231,57 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById(containerId);
         container.innerHTML = ''; // Temizle
         
-        // Gol olasılığına göre oyuncuları sırala
-        const sortedPlayers = [...players].sort((a, b) => b.scoring_prob - a.scoring_prob);
-        
-        sortedPlayers.forEach(player => {
-            const percentage = (player.scoring_prob * 100).toFixed(1);
+        if (!Array.isArray(players) || players.length === 0) {
             const listItem = document.createElement('li');
-            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-            
-            // Oyuncu adı ve mevkisi
-            const playerInfo = document.createElement('div');
-            playerInfo.innerHTML = `
-                <span class="fw-bold">${player.name}</span>
-                <span class="badge bg-secondary ms-2">${player.position}</span>
-            `;
-            
-            // Gol olasılığı
-            const probBadge = document.createElement('span');
-            
-            // Olasılığa göre renk belirle
-            let badgeClass = 'bg-info';
-            if (percentage > 50) {
-                badgeClass = 'bg-danger';
-            } else if (percentage > 30) {
-                badgeClass = 'bg-warning text-dark';
-            }
-            
-            probBadge.className = `badge ${badgeClass}`;
-            probBadge.textContent = `${percentage}%`;
-            
-            listItem.appendChild(playerInfo);
-            listItem.appendChild(probBadge);
+            listItem.className = 'list-group-item text-center text-muted';
+            listItem.textContent = 'Oyuncu verisi bulunamadı';
             container.appendChild(listItem);
-        });
+            return;
+        }
+        
+        try {
+            // Gol olasılığına göre oyuncuları sırala
+            const sortedPlayers = [...players].sort((a, b) => (b.scoring_prob || 0) - (a.scoring_prob || 0));
+            
+            sortedPlayers.forEach(player => {
+                if (!player || typeof player !== 'object') return;
+                
+                const percentage = ((player.scoring_prob || 0) * 100).toFixed(1);
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                
+                // Oyuncu adı ve mevkisi
+                const playerInfo = document.createElement('div');
+                playerInfo.innerHTML = `
+                    <span class="fw-bold">${player.name || 'Bilinmeyen'}</span>
+                    <span class="badge bg-secondary ms-2">${player.position || '-'}</span>
+                `;
+                
+                // Gol olasılığı
+                const probBadge = document.createElement('span');
+                
+                // Olasılığa göre renk belirle
+                let badgeClass = 'bg-info';
+                if (percentage > 50) {
+                    badgeClass = 'bg-danger';
+                } else if (percentage > 30) {
+                    badgeClass = 'bg-warning text-dark';
+                }
+                
+                probBadge.className = `badge ${badgeClass}`;
+                probBadge.textContent = `${percentage}%`;
+                
+                listItem.appendChild(playerInfo);
+                listItem.appendChild(probBadge);
+                container.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('Oyuncu verileri işlenirken hata:', error);
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item text-center text-danger';
+            listItem.textContent = 'Oyuncu verileri yüklenirken hata oluştu';
+            container.appendChild(listItem);
+        }
     }
 
     // Favorilere takım ekleme/çıkarma için fonksiyonlar
