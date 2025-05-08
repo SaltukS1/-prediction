@@ -158,4 +158,87 @@ body {
     #scorePrediction {
         font-size: 3rem;
     }
+}
+
+/* Canlı Maç Takibi Özellikleri */
+#matchEvents {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#matchEvents .list-group-item {
+    transition: all 0.3s ease;
+    animation: fadeInTop 0.5s ease;
+}
+
+#matchEvents .goal {
+    background-color: #ffefc5;
+    border-left: 3px solid #ffc107;
+    font-weight: bold;
+}
+
+#matchEvents .yellow-card {
+    background-color: #fffbe6;
+    border-left: 3px solid #ffc107;
+}
+
+#matchEvents .red-card {
+    background-color: #fff0f0;
+    border-left: 3px solid #dc3545;
+}
+
+@keyframes fadeInTop {
+    from { 
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#liveScore {
+    font-weight: bold;
+    font-size: 2.2rem;
+    transition: all 0.3s ease;
+}
+
+#liveMatchSection .progress {
+    height: 20px;
+    transition: all 0.5s ease;
+}
+
+#possessionBar {
+    transition: width 0.5s ease;
+}
+
+#matchTime {
+    font-size: 1.2rem;
+    padding: 0.4rem 0.8rem;
+    transition: all 0.3s ease;
+}
+
+/* Skorun değiştiği anı vurgulamak için animasyon */
+@keyframes scoreChange {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); color: #dc3545; }
+    100% { transform: scale(1); }
+}
+
+.score-changed {
+    animation: scoreChange 1s ease;
+}
+
+/* Karanlık mod için ek stiller */
+[data-bs-theme="dark"] #matchEvents .goal {
+    background-color: rgba(255, 193, 7, 0.2);
+}
+
+[data-bs-theme="dark"] #matchEvents .yellow-card {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+[data-bs-theme="dark"] #matchEvents .red-card {
+    background-color: rgba(220, 53, 69, 0.1);
 } 
