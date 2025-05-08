@@ -40,6 +40,8 @@ logs/
 
 # Models
 models/
+# Ancak src/models klasörünü dahil et (Python kodlarını içeren)
+!src/models/
 
 # Tensorflow
 *.h5
