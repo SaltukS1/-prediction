@@ -53,4 +53,4 @@ FOOTBALL_DATA_API_KEY=your_api_key_here
 
 ## Lisans
 
-Bu proje MIT Lisansı altında lisanslanmıştır. 
+Bu proje MIT Lisansı altında lisanslanmıştır.
